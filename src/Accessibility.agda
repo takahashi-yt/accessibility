@@ -25,7 +25,7 @@ open import CZFAxioms
    
    Acc-ind : {ℓ : Level} {C : (v : 𝕍) → Acc v → Set ℓ} →
                (IH : (v : 𝕍) (f : (x : index (tc v)) → Acc (pred (tc v) x)) →
-                   ((x : index (tc v)) → C (pred (tc v) x) (f x)) → C v (Acc-intro v f)) →
+                   ((x : index (tc v)) → C (pred (tc v) x) (f x)) → C v (prog v f)) →
                  (a : 𝕍) (t : Acc a) → C a t
 -}
 
