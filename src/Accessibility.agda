@@ -14,7 +14,7 @@ open import CZFAxioms
 
 
 {-
-   Using the function extensionality, we derive the introduction and elimination rules for
+   Using function extensionality, we derive the introduction and elimination rules for
    the accessibility predicate Acc with respect to the membership relation on 𝕍
 
    -- the Acc-introduction rule ("prog" is the abbreviation of "progressive")
@@ -30,7 +30,7 @@ open import CZFAxioms
 -}
 
 
--- the function extensionality
+-- function extensionality
 
 postulate
   fun-ext : {a b : Level} {A : Set a} {B : A → Set b} {f g : (x : A) → B x} →
@@ -38,7 +38,7 @@ postulate
 
 
 -- We first prove the propositional computation rule of the induction principle for transitive closures of sets
--- First we prove the lemma for this propositional computation rule using the function extensionality
+-- We prove the lemma for this propositional computation rule using function extensionality
 
 tcTIcomp-lem : (a : 𝕍) → {ℓ : Level} → (F : 𝕍 → Set ℓ) (e : (a : 𝕍) → (∀𝕧∈ (tc a) λ v → F v) → F a) →
                  (∈-tcTI e a ≡ e a (λ x → ∈-tcTI e (pred (tc a) x))) ×
@@ -146,38 +146,37 @@ Acc-inv a = transp (λ A → A) (tcTIcomp (λ a' IH → (x : index (tc a')) → 
 
 -- We first prove a lemma for transporting along the equality prog a (Acc-inv a t) ≡ t
 
-transpAcc : {ℓ : Level} {C : (v : 𝕍) → Acc v → Set ℓ} →
+transpAcc : {ℓ : Level} → (C : (v : 𝕍) → Acc v → Set ℓ) →
               (IH : (v : 𝕍) (f : (x : index (tc v)) → Acc (pred (tc v) x)) →
                   ((x : index (tc v)) → C (pred (tc v) x) (f x)) → C v (prog v f)) →
                 (a : 𝕍) (t : Acc a) → C a (prog a (Acc-inv a t)) → C a t
-transpAcc {ℓ} {C} IH a t =
+transpAcc {ℓ} C IH a t =
   transp (λ s → C a s)
          (transpCancel1 (tcTIcomp (λ a' IH → (x : index (tc a')) → IH x) a) t)
 
 -- the Acc-elimination rule
 
-Acc-ind : {ℓ : Level} {C : (v : 𝕍) → Acc v → Set ℓ} →
+Acc-ind : {ℓ : Level} → (C : (v : 𝕍) → Acc v → Set ℓ) →
              (IH : (v : 𝕍) (f : (x : index (tc v)) → Acc (pred (tc v) x)) →
                  ((x : index (tc v)) → C (pred (tc v) x) (f x)) → C v (prog v f)) →
                (a : 𝕍) (t : Acc a) → C a t
-Acc-ind {ℓ} {C} IH =
+Acc-ind {ℓ} C IH =
   ∈-tcTI {F = λ v → (u : Acc v) → C v u}
          (λ v subIH u →
-           transpAcc IH v u (IH v (Acc-inv v u) (λ x → subIH x (Acc-inv v u x))))
+           transpAcc C IH v u (IH v (Acc-inv v u) (λ x → subIH x (Acc-inv v u x))))
 
 
 -- the propositional computation rule for Acc-ind
 
-Acc-comp : {ℓ : Level} {C : (v : 𝕍) → Acc v → Set ℓ} →
+Acc-comp : {ℓ : Level} → (C : (v : 𝕍) → Acc v → Set ℓ) →
              (IH : (v : 𝕍) (f : (x : index (tc v)) → Acc (pred (tc v) x)) →
                  ((x : index (tc v)) → C (pred (tc v) x) (f x)) → C v (prog v f)) →
-               (a : 𝕍) (g : (x : index (tc a)) → Acc (pred (tc a) x)) →
-                 Acc-ind {C = C} IH a (prog a g) ≡
-                 transpAcc {C = C} IH a (prog a g)
-                   (IH a (Acc-inv a (prog a g))
-                     (λ x → Acc-ind {C = C} IH (pred (tc a) x) (Acc-inv a (prog a g) x)))
-Acc-comp {ℓ} {C} IH a g =
+               (a : 𝕍) (t : Acc a) →
+                 Acc-ind C IH a t ≡
+                 transpAcc C IH a t
+                   (IH a (Acc-inv a t)
+                     (λ x → Acc-ind C IH (pred (tc a) x) (Acc-inv a t x)))
+Acc-comp {ℓ} C IH a =
   inv-fun-ext (tcTIcomp (λ v subIH u →
-                           transpAcc IH v u (IH v (Acc-inv v u) (λ x → subIH x (Acc-inv v u x))))
+                           transpAcc C IH v u (IH v (Acc-inv v u) (λ x → subIH x (Acc-inv v u x))))
                         a)
-              (prog a g)

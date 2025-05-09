@@ -76,6 +76,10 @@ apd f refl = refl
   ≡trans-lem : (x y : A) → x ≡ y → (z : A) → y ≡ z → x ≡ z
   ≡trans-lem x .x refl = λ z r → r
 
+≡symCancel : {a : Level} {A : Set a} {x y : A} →
+               (p : x ≡ y) → ≡sym (≡sym p) ≡ p
+≡symCancel refl = refl
+
 
 -- cancellation of transport
 
