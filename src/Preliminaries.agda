@@ -64,6 +64,10 @@ apd : {a b : Level} {A : Set a} {B : A → Set b} → (f : (x : A) → B x) → 
   (p : x ≡ y) → transp B p (f x) ≡ f y
 apd f refl = refl
 
+cong : {a b : Level} {A : Set a} {B : Set b} (f : A → B) → {x y : A} →
+  x ≡ y → f x ≡ f y
+cong f refl = refl
+
 
 -- ≡ is an equivalence relation
 

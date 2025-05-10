@@ -180,3 +180,25 @@ Acc-comp {ℓ} C IH a =
   inv-fun-ext (tcTIcomp (λ v subIH u →
                            transpAcc C IH v u (IH v (Acc-inv v u) (λ x → subIH x (Acc-inv v u x))))
                         a)
+
+
+-- the uniqueness of a proof for Acc v for any v : 𝕍 by means of function extensionality
+
+Acc-unique : (a : 𝕍) → Σ (Acc a) λ t → (s : Acc a) → t ≡ s
+Acc-unique a = let 𝕍⊆Acc : (v : 𝕍) → Acc v
+                   𝕍⊆Acc = ∈-tcTI {F = Acc} λ v IH → prog v IH
+                   
+                   Acc-prop : (v : 𝕍) (t s : Acc v) → t ≡ s
+                   Acc-prop = ∈-tcTI {F = λ v → (t s : Acc v) → t ≡ s}
+                                     λ v IH t s →
+                                     let eq : prog v (Acc-inv v t) ≡ prog v (Acc-inv v s)
+                                         eq = cong (prog v)
+                                                   (fun-ext λ x → IH x
+                                                                     (Acc-inv v t x)
+                                                                     (Acc-inv v s x))
+                                     in ≡trans (≡sym (transpCancel1
+                                                 (tcTIcomp (λ a' IH → (x : index (tc a')) → IH x) v) t))
+                                               (≡trans eq
+                                                       (transpCancel1
+                                                         (tcTIcomp (λ a' IH → (x : index (tc a')) → IH x) v) s))
+               in 𝕍⊆Acc a , λ s → Acc-prop a (𝕍⊆Acc a) s
